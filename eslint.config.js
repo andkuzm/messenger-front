@@ -1,12 +1,15 @@
+// eslint.config.js
 import js from "@eslint/js";
-import globals from "globals";
+import tseslint from "typescript-eslint";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
-import tseslint from "typescript-eslint";
-import { globalIgnores } from "eslint/config";
+import globals from "globals";
+import importPlugin from "eslint-plugin-import";
 
 export default tseslint.config([
-  globalIgnores(["dist"]),
+  {
+    ignores: ["dist"],
+  },
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
@@ -15,56 +18,57 @@ export default tseslint.config([
       reactHooks.configs["recommended-latest"],
       reactRefresh.configs.vite,
     ],
-
-    'import/no-restricted-paths': [ //general structure: https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md
-      'error',
-      {
-        zones: [
-          // disables cross-feature imports:
-          // eg. src/features/discussions should not import from src/features/comments, etc.
-          {
-            target: './src/features/auth',
-            from: './src/features',
-            except: ['./auth'],
-          },
-          {
-            target: './src/features/comments',
-            from: './src/features',
-            except: ['./comments'],
-          },
-          {
-            target: './src/features/discussions',
-            from: './src/features',
-            except: ['./discussions'],
-          },
-          {
-            target: './src/features/teams',
-            from: './src/features',
-            except: ['./teams'],
-          },
-          {
-            target: './src/features/users',
-            from: './src/features',
-            except: ['./users'],
-          },
-          {
-            target: './src/features',
-            from: './src/app',
-          },
-          {
-            target: [
-              './src/components',
-              './src/hooks',
-              './src/lib',
-              './src/types',
-              './src/utils',
-            ],
-            from: ['./src/features', './src/app'],
-          },
-        ],
-      },
-    ],
-
+    plugins: {
+      import: importPlugin,
+    },
+    rules: {
+      "import/no-restricted-paths": [
+        "error",
+        {
+          zones: [
+            {
+              target: "./src/features/auth",
+              from: "./src/features",
+              except: ["./auth"],
+            },
+            {
+              target: "./src/features/comments",
+              from: "./src/features",
+              except: ["./comments"],
+            },
+            {
+              target: "./src/features/discussions",
+              from: "./src/features",
+              except: ["./discussions"],
+            },
+            {
+              target: "./src/features/teams",
+              from: "./src/features",
+              except: ["./teams"],
+            },
+            {
+              target: "./src/features/users",
+              from: "./src/features",
+              except: ["./users"],
+            },
+            {
+              target: "./src/features",
+              from: "./src/app",
+            },
+            {
+              target: [
+                "./src/components",
+                "./src/hooks",
+                "./src/lib",
+                "./src/types",
+                "./src/utils",
+              ],
+              from: ["./src/features", "./src/app"],
+            },
+          ],
+        },
+      ],
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
