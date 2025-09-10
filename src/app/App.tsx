@@ -7,9 +7,9 @@ import Footer from "../components/Footer.tsx";
 function App() {
 
   return (
-      <div className={"grid grid-rows-12 h-screen w-11/12 pl-5"}>
+      <div className="grid grid-rows-12 h-screen w-11/12 pl-5 max-h-screen">
           <Header/>
-          <div className="row-span-10 grid grid-cols-3">
+          <div className="row-span-10 grid grid-cols-3 max-h-screen ">
               <SideBar/>
               <AppRouter/>
           </div>
