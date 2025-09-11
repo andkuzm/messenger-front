@@ -3,13 +3,13 @@ import {createSlice, type PayloadAction} from "@reduxjs/toolkit";
 type AuthState = {
     token: string | null;
     username: string | null;
-    id: bigint|null;
+    user_id: bigint|null;
 };
 
 const initialState: AuthState = {
     token: null,
     username: null,
-    id: null,
+    user_id: null,
 };
 
 const authSlice = createSlice({
@@ -19,12 +19,12 @@ const authSlice = createSlice({
         setCredentials(state, action: PayloadAction<AuthState>) {
             state.token = action.payload.token;
             state.username = action.payload.username;
-            state.id = action.payload.id;
+            state.user_id = action.payload.user_id;
         },
         logout(state) {
             state.token = null;
             state.username = null;
-            state.id = null;
+            state.user_id = null;
         },
     },
 });
