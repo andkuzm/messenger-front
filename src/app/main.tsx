@@ -14,6 +14,6 @@ createRoot(document.getElementById("root")!).render(
           <ChakraProvider value={customSystem}>
               <App />
           </ChakraProvider>
-      </StrictMode>,
+      </StrictMode>
     </QueryClientProvider>
 );
