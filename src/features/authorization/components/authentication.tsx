@@ -1,28 +1,30 @@
-import { Button, CloseButton, Drawer, Portal } from "@chakra-ui/react"
-import { useState } from "react"
+import {Button, CloseButton, Drawer, Input, Portal, Stack} from "@chakra-ui/react"
+import {useRef} from "react"
 
-export default function Login() {
-    const [open, setOpen] = useState(false)
-
+export default function Authentication() {
+    const ref = useRef<HTMLInputElement | null>(null)
     return (
-        <Drawer.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
+        <Drawer.Root initialFocusEl={() => ref.current} restoreFocus={true}>
             <Drawer.Trigger asChild>
                 <Button variant="outline" size="sm">
-                    Open Drawer
+                    Authenticate
                 </Button>
             </Drawer.Trigger>
             <Portal>
                 <Drawer.Backdrop />
-                <Drawer.Positioner>
+                <Drawer.Positioner padding="20">
                     <Drawer.Content>
                         <Drawer.Header>
-                            <Drawer.Title>Drawer Title</Drawer.Title>
+                            <Drawer.Title>Authentication</Drawer.Title>
                         </Drawer.Header>
                         <Drawer.Body>
                             <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-                                eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                Please, fill the login and password areas. Check the "register" box if you have no registered account.
                             </p>
+                            <Stack mt="5">
+                                <Input ref={ref} placeholder="Authentication" />
+                                <Input placeholder="Password" />
+                            </Stack>
                         </Drawer.Body>
                         <Drawer.Footer>
                             <Button variant="outline">Cancel</Button>
