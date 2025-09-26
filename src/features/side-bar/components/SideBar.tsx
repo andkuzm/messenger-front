@@ -1,4 +1,4 @@
-import {useChatsByUser} from "@/hooks/useChats.ts";
+import {useChatsByUser} from "@/hooks/useChat.ts";
 import SideBarPlate from "@/features/side-bar/components/SideBarPlate.tsx";
 
 
