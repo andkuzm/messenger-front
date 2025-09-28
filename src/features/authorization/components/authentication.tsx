@@ -1,8 +1,33 @@
-import {Button, CloseButton, Drawer, Input, Portal, Stack} from "@chakra-ui/react"
-import {useRef} from "react"
+import {Button, Checkbox, CloseButton, Drawer, Input, Portal, Stack} from "@chakra-ui/react"
+import {useRef, useState} from "react"
+import * as React from "react";
+import {useLoginUser, useRegisterUser} from "../../../hooks/useUser.ts"
+import {useAppSelector} from "@/stores/store.ts";
 
 export default function Authentication() {
-    const ref = useRef<HTMLInputElement | null>(null)
+    const ref = useRef<HTMLInputElement | null>(null);
+
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [register, setRegister] = useState(false);
+    const { token, username_stored, user_id } = useAppSelector(state => state.auth);
+
+    const registerUser = useRegisterUser();
+    const loginUser = useLoginUser();
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (register) {
+            const registerResp = await registerUser.mutateAsync({username, password})
+            console.log("Registration attempt response: "+registerResp)
+        } else {
+            loginUser.mutate({ username, password },
+            {onSuccess: (data) => {console.log("login successful")}},
+            );
+        }
+    };
+
     return (
         <Drawer.Root initialFocusEl={() => ref.current} restoreFocus={true}>
             <Drawer.Trigger asChild>
@@ -19,17 +44,42 @@ export default function Authentication() {
                         </Drawer.Header>
                         <Drawer.Body>
                             <p>
-                                Please, fill the login and password areas. Check the "register" box if you have no registered account.
+                                Please, fill the login and password areas. Check the "register"
+                                box if you have no registered account.
                             </p>
-                            <Stack mt="5">
-                                <Input ref={ref} placeholder="Authentication" />
-                                <Input placeholder="Password" />
-                            </Stack>
+                            <form onSubmit={handleSubmit}>
+                                <Stack mt="5">
+                                    <Input
+                                        ref={ref}
+                                        placeholder="Login"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                    />
+                                    <Input
+                                        placeholder="Password"
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
+                                    <Checkbox.Root
+                                        checked={register}
+                                        onCheckedChange={() => setRegister(!register)}
+                                    >
+                                        <Checkbox.HiddenInput />
+                                        <Checkbox.Control />
+                                        <Checkbox.Label>Register</Checkbox.Label>
+                                    </Checkbox.Root>
+                                </Stack>
+                                <Drawer.Footer>
+                                    <Button variant="outline" type="button">
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit">
+                                        {register ? "Register" : "Login"}
+                                    </Button>
+                                </Drawer.Footer>
+                            </form>
                         </Drawer.Body>
-                        <Drawer.Footer>
-                            <Button variant="outline">Cancel</Button>
-                            <Button>Save</Button>
-                        </Drawer.Footer>
                         <Drawer.CloseTrigger asChild>
                             <CloseButton size="sm" />
                         </Drawer.CloseTrigger>
@@ -37,5 +87,5 @@ export default function Authentication() {
                 </Drawer.Positioner>
             </Portal>
         </Drawer.Root>
-    )
+    );
 }
