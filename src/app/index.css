@@ -1,9 +1,24 @@
 @import "tailwindcss";
 
+Portal{
+  --font-primary: "Roboto", sans-serif;
+  background: #272830;
+  color: #dddddd;
+}
 :root {
   --font-primary: "Roboto", sans-serif;
   background: #272830;
   color: #dddddd;
+}
+Button {
+  background: #dddddd;
+}
+Button:hover{
+  background: #272830;
+  color: #fff;
+}
+p:hover{
+  cursor:default;
 }
 /**{*/
 /*  border-color: #ff0000;*/

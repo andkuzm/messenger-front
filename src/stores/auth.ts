@@ -3,7 +3,7 @@ import {createSlice, type PayloadAction} from "@reduxjs/toolkit";
 type AuthState = {
     token: string | null;
     username_stored: string | null;
-    user_id: bigint|null|number;
+    user_id: number|null;
 };
 
 const initialState: AuthState = {

@@ -2,15 +2,12 @@ import {Button, Checkbox, CloseButton, Drawer, Input, Portal, Stack} from "@chak
 import {useRef, useState} from "react"
 import * as React from "react";
 import {useLoginUser, useRegisterUser} from "../../../hooks/useUser.ts"
-import {useAppSelector} from "@/stores/store.ts";
 
 export default function Authentication() {
     const ref = useRef<HTMLInputElement | null>(null);
-
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [register, setRegister] = useState(false);
-    const { token, username_stored, user_id } = useAppSelector(state => state.auth);
 
     const registerUser = useRegisterUser();
     const loginUser = useLoginUser();
@@ -23,7 +20,9 @@ export default function Authentication() {
             console.log("Registration attempt response: "+registerResp)
         } else {
             loginUser.mutate({ username, password },
-            {onSuccess: (data) => {console.log("login successful")}},
+            {onSuccess: (data) => {
+                console.log("login successful: "+data);
+            }},
             );
         }
     };
@@ -38,7 +37,7 @@ export default function Authentication() {
             <Portal>
                 <Drawer.Backdrop />
                 <Drawer.Positioner padding="20">
-                    <Drawer.Content>
+                    <Drawer.Content bg="white" color="#272830">
                         <Drawer.Header>
                             <Drawer.Title>Authentication</Drawer.Title>
                         </Drawer.Header>
@@ -71,10 +70,10 @@ export default function Authentication() {
                                     </Checkbox.Root>
                                 </Stack>
                                 <Drawer.Footer>
-                                    <Button variant="outline" type="button">
-                                        Cancel
-                                    </Button>
-                                    <Button type="submit">
+                                    <Button type="submit"
+                                            color="white"
+                                            bg="#272830"
+                                            _hover={{ bg: "white", color: "#272830", borderRadius:"md", borderColor: "#272830" }}>
                                         {register ? "Register" : "Login"}
                                     </Button>
                                 </Drawer.Footer>
