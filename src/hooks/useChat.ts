@@ -43,21 +43,27 @@ export function useInfiniteMessages(chatId: number, pageSize = 40) {
         },
         initialPageParam: undefined,
         getNextPageParam: (lastPage) => {
-            // use the smallest ID from the last batch as the cursor
             if (!lastPage || lastPage.length === 0) return undefined;
             return lastPage[lastPage.length - 1].id;
         },
     });
 }
 
-export function useCreateChat(userIds: number[], options: {title?: string}) {
-    return useMutation<Response>({
-        mutationFn: async () => {
-            const params: Record<string, string|number[]> = {};
-            params.userIds = userIds;
-            if (options?.title) params.title = options.title;
+export function useCreateChat() {
+    return useMutation({
+        mutationFn: async (chatCreationRequest: { userNames: string[]; options?: { title?: string } }) => {
+            const res = await api.post(`/chat/create`, chatCreationRequest);
+            return res.data;
+        },
+    });
+}
 
-            const res = await api.post(`/chat/create`, { params });
+export function useJoinChat() {
+    return useMutation({
+        mutationFn: async ( chatJoinRequest:{chatId:number, userId:number}) => {
+            const res = await api.put(`/${chatJoinRequest.chatId}/join`, chatJoinRequest.userId, {
+                headers: { "Content-Type": "application/json" },
+            });
             return res.data;
         },
     });

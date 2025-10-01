@@ -1,11 +1,13 @@
 import type {Message} from "@/types/Message.ts";
 
-class Users {
+type User = {
+    id: number;
+    username: string;
 }
 
 export type Chat = {
     id: number;
-    users: Users[];
+    users: User[];
     messageIDs: Message[];
     title: string;
 };

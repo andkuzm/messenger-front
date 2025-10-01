@@ -41,7 +41,7 @@ export function useLoginUser() {
                 setCredentials({
                     token,
                     username_stored: decoded.sub,
-                    user_id: decoded.userId,
+                    userId: decoded.userId,
                 })
             );
         },
