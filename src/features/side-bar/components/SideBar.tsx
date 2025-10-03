@@ -1,18 +1,14 @@
 import {useChatsByUser} from "@/hooks/useChat.ts";
 import {useAppSelector} from "@/stores/store.ts";
-import {Center, Spinner, VStack, Clipboard, Button} from "@chakra-ui/react";
+import {Center, Spinner, VStack, Clipboard, Button, ScrollArea} from "@chakra-ui/react";
 import SideBarPlate from "@/features/side-bar/components/SideBarPlate.tsx";
 import CreateOrJoinChatPlate from "@/features/side-bar/components/CreateOrJoinChatPlate.tsx";
-import {useEffect, useState} from "react";
+import ChatSendMessagePlate from "@/features/chat/components/ChatSendMessagePlate.tsx";
 
 
 export default function SideBar() {
-    useEffect(()=>{
-        console.log("rendered")
-    }, [])
     const {userId } = useAppSelector(state => state.auth);
-    const [requestRerender , setRequestRerender] = useState(false);
-    const { data: chats, isLoading, error } = useChatsByUser(userId);
+    const { data: chats, isLoading, error, refetch } = useChatsByUser(userId);
     if (isLoading) return (
         <Center className="border-r-2 pr-1 h-full">
             <VStack colorPalette="teal">
@@ -39,10 +35,19 @@ export default function SideBar() {
     );
     return (
         <div className="border-r-2 pr-1 h-full">
-            <CreateOrJoinChatPlate requestRerender={()=>{setRequestRerender(!requestRerender)}}/>
-            {chats?.map((chat) => (
-                <SideBarPlate key={chat.id} chat={chat}  />
-            ))}
+            <ScrollArea.Root>
+                <ScrollArea.Viewport>
+                    <ScrollArea.Content spaceY="4" textStyle="sm">
+                        {chats?.map((chat) => (
+                            <SideBarPlate key={chat.id} chat={chat}  />
+                        ))}
+                    </ScrollArea.Content>
+                </ScrollArea.Viewport>
+                <ScrollArea.Scrollbar>
+                    <ScrollArea.Thumb />
+                </ScrollArea.Scrollbar>
+                <ScrollArea.Corner />
+            </ScrollArea.Root>
         </div>
     );
 }

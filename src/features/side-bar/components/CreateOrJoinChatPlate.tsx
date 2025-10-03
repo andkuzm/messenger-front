@@ -3,7 +3,7 @@ import { Button, Input, Popover, Portal, Text } from "@chakra-ui/react"
 import {useCreateChat, useJoinChat} from "@/hooks/useChat.ts";
 import {useAppSelector} from "@/stores/store.ts";
 
-export default function CreateOrJoinChatPlate({requestRerender}:{requestRerender:()=>void}) {
+export default function CreateOrJoinChatPlate({requestChatRefetch}:{requestChatRefetch:()=>void}) {
     const [chatId, setChatId] = useState(-1);
     const [userNames, setUserNames] = useState([""]);
     const [title, setTitle] = useState("");
@@ -14,15 +14,13 @@ export default function CreateOrJoinChatPlate({requestRerender}:{requestRerender
     async function handleJoin() {
         if(chatId!==-1 && userId!==null) {
             const joinResp = await joinChat.mutateAsync({chatId, userId});
-            console.log("join attempt response: "+joinResp.data)
-            requestRerender();
+            requestChatRefetch();
         }
     }
     async function handleCreation() {
         if(userNames[0]!="") {
             const createResp = await createChat.mutateAsync({userNames: userNames, title:title.trim()!=""?title:undefined});
-            console.log("create attempt response: "+createResp)
-            requestRerender.call(null);
+            requestChatRefetch();
         }
     }
     return (
