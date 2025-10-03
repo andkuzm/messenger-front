@@ -4,6 +4,7 @@ import {useInfiniteMessages} from "@/hooks/useChat.ts";
 import { useVirtualizer } from "@tanstack/react-virtual"
 import {useEffect, useRef} from "react";
 import { ScrollArea } from "@chakra-ui/react";
+import ChatSendMessagePlate from "@/features/chat/components/ChatSendMessagePlate.tsx";
 
 
 export default function Chat() {
@@ -33,38 +34,26 @@ export default function Chat() {
         return <EmptyChatField />
     }
     return (
-        <ScrollArea.Root height="100%" maxWidth="full">
-            <ScrollArea.Viewport ref={scrollRef}>
-                <div
-                    style={{
-                        height: `${virtualizer.getTotalSize()}px`,
-                        width: "100%",
-                        position: "relative",
-                    }}
-                >
-                    {virtualizer.getVirtualItems().map((vi) => {
-                        const msg = messages[vi.index];
-                        return (
-                            <div
-                                key={msg.id}
-                                style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100%",
-                                    height: `${vi.size}px`,
-                                    transform: `translateY(${vi.start}px)`,
-                                }}
-                            >
-                                <div className="p-2">
-                                    <strong>{msg.sender.username}</strong>: {msg.message}
+        <div className="h-full">
+            <ScrollArea.Root>
+                <ScrollArea.Viewport ref={scrollRef}>
+                    <div>
+                        {virtualizer.getVirtualItems().map((vi) => {
+                            const msg = messages[vi.index];
+                            return (
+                                <div>
+                                    <div>
+                                        <strong>{msg.sender.username}</strong>: {msg.message}
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </ScrollArea.Viewport>
-            <ScrollArea.Scrollbar />
-        </ScrollArea.Root>
+                            );
+                        })}
+                    </div>
+                </ScrollArea.Viewport>
+
+                <ChatSendMessagePlate chatId={chatId}/>
+                <ScrollArea.Scrollbar />
+            </ScrollArea.Root>
+        </div>
     );
 }

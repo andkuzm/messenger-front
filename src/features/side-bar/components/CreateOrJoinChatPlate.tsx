@@ -3,22 +3,26 @@ import { Button, Input, Popover, Portal, Text } from "@chakra-ui/react"
 import {useCreateChat, useJoinChat} from "@/hooks/useChat.ts";
 import {useAppSelector} from "@/stores/store.ts";
 
-export default function CreateOrJoinChatPlate() {
+export default function CreateOrJoinChatPlate({requestRerender}:{requestRerender:()=>void}) {
     const [chatId, setChatId] = useState(-1);
     const [userNames, setUserNames] = useState([""]);
+    const [title, setTitle] = useState("");
     const joinChat = useJoinChat();
     const createChat = useCreateChat();
     const { userId } = useAppSelector(state => state.auth);
+
     async function handleJoin() {
         if(chatId!==-1 && userId!==null) {
             const joinResp = await joinChat.mutateAsync({chatId, userId});
             console.log("join attempt response: "+joinResp.data)
+            requestRerender();
         }
     }
     async function handleCreation() {
         if(userNames[0]!="") {
-            const createResp = await createChat.mutateAsync({userNames: userNames, options: undefined});
-            console.log("create attempt response: "+createResp.data)
+            const createResp = await createChat.mutateAsync({userNames: userNames, title:title.trim()!=""?title:undefined});
+            console.log("create attempt response: "+createResp)
+            requestRerender.call(null);
         }
     }
     return (
@@ -61,11 +65,14 @@ export default function CreateOrJoinChatPlate() {
                             <Popover.Body>
                                 <Popover.Title fontWeight="medium">Chat creation</Popover.Title>
                                 <Text my="4">
-                                    write a username of the person you wish to write to
+                                    write a username of the person you wish to write to and a title for the message thread(optional)
                                 </Text>
                                 <Input placeholder="username" size="sm"
                                        value={userNames}
                                        onChange={(e) => setUserNames([e.target.value])}/>
+                                <Input placeholder="title" size="sm"
+                                       value={title}
+                                       onChange={(e) => setTitle(e.target.value)}/>
                                 <Button size="sm" variant="outline" onClick={handleCreation}>Write</Button>
                             </Popover.Body>
                         </Popover.Content>

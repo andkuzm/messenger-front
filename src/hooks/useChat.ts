@@ -7,6 +7,7 @@ export function useChatsByUser(userId: number) {
     return useQuery<Chat[]>({
         queryKey: ["chats", userId],
         queryFn: async () => {
+            if(userId==null) return [];
             const res = await api.get(`/chat/by-user/${userId}`);
             return res.data;
         },
@@ -51,7 +52,7 @@ export function useInfiniteMessages(chatId: number, pageSize = 40) {
 
 export function useCreateChat() {
     return useMutation({
-        mutationFn: async (chatCreationRequest: { userNames: string[]; options?: { title?: string } }) => {
+        mutationFn: async (chatCreationRequest: { userNames: string[]; title?: string }) => {
             const res = await api.post(`/chat/create`, chatCreationRequest);
             return res.data;
         },
@@ -61,9 +62,7 @@ export function useCreateChat() {
 export function useJoinChat() {
     return useMutation({
         mutationFn: async ( chatJoinRequest:{chatId:number, userId:number}) => {
-            const res = await api.put(`/${chatJoinRequest.chatId}/join`, chatJoinRequest.userId, {
-                headers: { "Content-Type": "application/json" },
-            });
+            const res = await api.put(`/chat/${chatJoinRequest.chatId}/join`, chatJoinRequest.userId);
             return res.data;
         },
     });

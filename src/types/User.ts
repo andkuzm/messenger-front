@@ -1,6 +1,6 @@
 export type User = {
     id: number;
-    timestamp: Date;
+    timestamp?: Date;
     username: string;
-    password: string;
+    password?: string;
 }
