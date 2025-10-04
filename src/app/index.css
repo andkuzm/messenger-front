@@ -12,6 +12,7 @@ Portal{
 }
 Button {
   background: #dddddd;
+  text-wrap: wrap;
 }
 Button:hover{
   background: #272830;

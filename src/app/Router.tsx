@@ -9,11 +9,13 @@ import Footer from "@/components/Footer.tsx";
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <div className="grid grid-rows-12 h-screen w-11/12 pl-5 max-h-screen gap-1">
+        element: <div className="grid grid-rows-12 h-screen w-11/12 pl-5 gap-1">
                     <Header/>
-                    <div className="row-span-10 grid grid-cols-3 max-h-screen ">
+                    <div className="row-span-10 grid grid-cols-3 h-full gap-5">
                         <SideBar/>
-                        <Outlet/>
+                        <div className="col-span-2 max-h-[90vh]">
+                            <Outlet/>
+                        </div>
                     </div>
                     <Footer/>
                 </div>,

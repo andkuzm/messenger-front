@@ -2,6 +2,7 @@ import {Button, Checkbox, CloseButton, Drawer, Input, Portal, Stack} from "@chak
 import {useRef, useState} from "react"
 import * as React from "react";
 import {useLoginUser, useRegisterUser} from "../../../hooks/useUser.ts"
+import {useNavigate} from "react-router-dom";
 
 export default function Authentication() {
     const ref = useRef<HTMLInputElement | null>(null);
@@ -11,17 +12,20 @@ export default function Authentication() {
 
     const registerUser = useRegisterUser();
     const loginUser = useLoginUser();
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (register) {
             const registerResp = await registerUser.mutateAsync({username, password})
+            navigate("/")
             console.log("Registration attempt response: "+registerResp)
         } else {
             loginUser.mutate({ username, password },
             {onSuccess: (data) => {
                 console.log("login successful: "+data);
+                navigate("/")
             }},
             );
         }

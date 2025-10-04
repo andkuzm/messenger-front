@@ -8,6 +8,6 @@ type User = {
 export type Chat = {
     id: number;
     users: User[];
-    messageIDs: Message[];
+    messageIDs?: Message[];
     title: string;
 };

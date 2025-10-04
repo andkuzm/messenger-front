@@ -13,18 +13,18 @@ export default function CreateOrJoinChatPlate({requestChatRefetch}:{requestChatR
 
     async function handleJoin() {
         if(chatId!==-1 && userId!==null) {
-            const joinResp = await joinChat.mutateAsync({chatId, userId});
+            await joinChat.mutateAsync({chatId, userId});
             requestChatRefetch();
         }
     }
     async function handleCreation() {
         if(userNames[0]!="") {
-            const createResp = await createChat.mutateAsync({userNames: userNames, title:title.trim()!=""?title:undefined});
+            await createChat.mutateAsync({userNames: userNames, title:title.trim()!=""?title:undefined});
             requestChatRefetch();
         }
     }
     return (
-        <div className="flex flex-row gap-10">
+        <div className="flex flex-col gap-5 lg:gap-10 md:flex-row">
             <Popover.Root>
                 <Popover.Trigger asChild>
                     <Button size="sm" variant="outline">
@@ -41,7 +41,6 @@ export default function CreateOrJoinChatPlate({requestChatRefetch}:{requestChatR
                                     Write id of the chat you wish to join.
                                 </Text>
                                 <Input placeholder="Chat Id" size="sm"
-                                       value={chatId}
                                        onChange={(e) => setChatId(parseInt(e.target.value))}/>
                                 <Button size="sm" variant="outline" onClick={handleJoin}>Join</Button>
                             </Popover.Body>
