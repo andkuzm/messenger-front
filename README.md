@@ -17,4 +17,4 @@ npm>=11.4.1
 
 Running the backend (https://github.com/andkuzm/messenger) is expected to be accessible for the frontend to function properly. By default, it is assumed to be running on localhost:8080; if another port or host is used, `VITE_API_URL=http://localhost:8080` should be changed accordingly in the .env file in the root of the frontend.
 ## building
-After preconditions are met, `npm run dev` should correctly launch the frontend
+After preconditions are met, `npm install` needs to be executed to install all required dependencies, and afterwards `npm run dev` should correctly launch the frontend.
