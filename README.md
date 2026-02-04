@@ -7,7 +7,7 @@ This is a pet project, a frontend part of a simple messenger with the most basic
 - Messenging in said chats
 
 
->The project is currently incomplete.
+>The project is in progress.
 
 
 # running
