@@ -1,143 +1,112 @@
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import EmptyChatField from "./EmptyChatField.tsx";
-import {useChatById, useInfiniteMessages} from "@/hooks/useChat.ts";
-import {useVirtualizer, type VirtualItem} from "@tanstack/react-virtual"
-import {useCallback, useEffect, useMemo} from "react";
-import {Box, Center, IconButton, ScrollArea, Spinner} from "@chakra-ui/react";
+import { useChatById, useInfiniteMessages } from "@/hooks/useChat.ts";
+import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Box, Center, IconButton, Spinner } from "@chakra-ui/react";
 import ChatSendMessagePlate from "@/features/chat/components/ChatSendMessagePlate.tsx";
-import { useStickToBottom } from "use-stick-to-bottom"
 import Message from "@/features/message/components/Message.tsx";
-import {useAppSelector} from "@/stores/store.ts";
-import {LuArrowDown} from "react-icons/lu";
+import { useAppSelector } from "@/stores/store.ts";
+import { LuArrowDown } from "react-icons/lu";
 
+const START_INDEX = 100_000;
 
 export default function Chat() {
-    const chatId = parseInt(useParams()['chatId'] as string);
-    const {userId} = useAppSelector((state) => state.auth);
-    const { data:chat, isLoading, error } = useChatById(chatId);
-    const sticky = useStickToBottom()
-    // const scrollRef = useRef<HTMLDivElement | null>(null)
-    const { data, fetchNextPage, error: error_infinite, hasNextPage, isFetchingNextPage, refetch } =
+    const chatId = parseInt(useParams()["chatId"] as string);
+    const { userId } = useAppSelector((state) => state.auth);
+    const { data: chat, isLoading, error } = useChatById(chatId);
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
         useInfiniteMessages(chatId);
 
-    const messages = data?.pages.flatMap((p) => p) ?? [];
+    const messages = useMemo(
+        () => data?.pages.flatMap((p) => p).reverse() ?? [],
+        [data],
+    );
 
-    const virtualizer = useVirtualizer({
-        count: messages.length,
-        getScrollElement: () => sticky.scrollRef.current,
-        estimateSize: () => 44,
-        overscan: 3,
-    });
-
-    const contentProps = useMemo(
-        (): React.ComponentProps<"div"> => ({
-            style: {
-                height: `${virtualizer.getTotalSize()}px`,
-                width: "full",
-                position: "relative",
-            },
-        }),
-        [virtualizer],
-    )
-
-
-    const getItemProps = useCallback(
-        (item: VirtualItem): React.ComponentProps<"div"> => ({
-            style: {
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                paddingBottom: 4,
-                paddingTop: 4,
-                height: `${item.size}px`,
-                transform: `translateY(${item.start}px)`,
-            },
-        }),
-        [],
-    )
+    const [firstItemIndex, setFirstItemIndex] = useState(START_INDEX);
+    const prevCountRef = useRef(0);
 
     useEffect(() => {
-        const [first] = virtualizer.getVirtualItems();
-        if (first && first.index === 0 && hasNextPage && !isFetchingNextPage) {
+        const added = messages.length - prevCountRef.current;
+        // Only anchor scroll when prepending older messages, not on initial load
+        if (added > 0 && prevCountRef.current > 0) {
+            setFirstItemIndex((prev) => prev - added);
+        }
+        prevCountRef.current = messages.length;
+    }, [messages.length]);
+
+    const virtuosoRef = useRef<VirtuosoHandle>(null);
+    const [atBottom, setAtBottom] = useState(true);
+
+    const scrollToBottom = useCallback(() => {
+        virtuosoRef.current?.scrollToIndex({
+            index: "LAST",
+            behavior: "smooth",
+        });
+    }, []);
+
+    const handleStartReached = useCallback(() => {
+        if (hasNextPage && !isFetchingNextPage) {
             fetchNextPage();
         }
-    }, [fetchNextPage, hasNextPage, isFetchingNextPage, virtualizer]);
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     if (!chatId) {
-        return <EmptyChatField />
+        return <EmptyChatField />;
     }
 
     if (error) {
-        return (
-            <Center>
-                {error.message}
-                {error_infinite?.message}
-            </Center>
-        )
+        return <Center>{error.message}</Center>;
     }
-    if(isLoading||!data) {
+
+    if (isLoading || !data || !chat) {
         return (
             <Center>
                 <Spinner />
                 <p>Chat is being loaded</p>
             </Center>
-        )
+        );
     }
 
     return (
-        <div className="h-full">
-            <p>Other users that can read this chat:{chat.users.map(user=>{
-                if(user.id==userId) {
-                    return "";
-                }
-                return " "+user.username})
-            }</p>
-            <ScrollArea.Root maxHeight="80vh">
-                <ScrollArea.Viewport ref={sticky.scrollRef}
-                    css={{
-                        "--scroll-shadow-size": "2rem",
-                        maskImage:
-                            "linear-gradient(#000,#000,transparent 0,#000 var(--scroll-shadow-size),#000 calc(100% - var(--scroll-shadow-size)),transparent)",
-                        "&[data-at-top]": {
-                            maskImage:
-                                "linear-gradient(180deg,#000 calc(100% - var(--scroll-shadow-size)),transparent)",
-                        },
-                        "&[data-at-bottom]": {
-                            maskImage:
-                                "linear-gradient(0deg,#000 calc(100% - var(--scroll-shadow-size)),transparent)",
-                        },
-                    }}
-                >
-                    <ScrollArea.Content {...contentProps} ref={sticky.contentRef}>
-                        <div>
-                            {virtualizer.getVirtualItems().map((vi) => {
-                                const msg = messages[messages.length-vi.index-1];
-                                return (
-                                    <div key={vi.key} {...getItemProps(vi)}>
-                                        <Message msg={msg}/>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </ScrollArea.Content>
-                </ScrollArea.Viewport>
-                {!sticky.isAtBottom && (
-                    <Box position="absolute" top="13" right="4">
+        <div className="h-full flex flex-col">
+            <p>
+                Other users that can read this chat:
+                {chat.users.map((user) => {
+                    if (user.id == userId) return "";
+                    return " " + user.username;
+                })}
+            </p>
+            <div style={{ flex: "1 1 0", minHeight: 0, position: "relative" }}>
+                <Virtuoso
+                    ref={virtuosoRef}
+                    style={{ height: "100%" }}
+                    firstItemIndex={firstItemIndex}
+                    initialTopMostItemIndex={messages.length - 1}
+                    data={messages}
+                    followOutput="smooth"
+                    startReached={handleStartReached}
+                    atBottomStateChange={setAtBottom}
+                    itemContent={(_, msg) => <Message msg={msg} />}
+                />
+                {!atBottom && (
+                    <Box position="absolute" bottom="4" right="4">
                         <IconButton
                             color="#272830"
                             size="sm"
-                            onClick={() => {
-                                sticky.scrollToBottom()
-                            }}
+                            onClick={scrollToBottom}
                             variant="solid"
                         >
-                            <LuArrowDown/>
+                            <LuArrowDown />
                         </IconButton>
                     </Box>
                 )}
-                <ChatSendMessagePlate chat={chat} refetch={refetch} stickyScroll={()=>{sticky.scrollToBottom()}}/>
-            </ScrollArea.Root>
+            </div>
+            <ChatSendMessagePlate
+                chat={chat}
+                refetch={refetch}
+                stickyScroll={scrollToBottom}
+            />
         </div>
     );
 }
