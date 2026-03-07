@@ -8,6 +8,7 @@ import ChatSendMessagePlate from "@/features/chat/components/ChatSendMessagePlat
 import Message from "@/features/message/components/Message.tsx";
 import { useAppSelector } from "@/stores/store.ts";
 import { LuArrowDown } from "react-icons/lu";
+import { useReduceNotifications } from "@/hooks/useNotification.ts";
 
 const START_INDEX = 100_000;
 
@@ -17,6 +18,13 @@ export default function Chat() {
     const { data: chat, isLoading, error } = useChatById(chatId);
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
         useInfiniteMessages(chatId);
+    const reduceNotifications = useReduceNotifications();
+
+    useEffect(() => {
+        if (chatId) {
+            reduceNotifications.mutate(chatId);
+        }
+    }, [chatId]);
 
     const messages = useMemo(
         () => data?.pages.flatMap((p) => p).reverse() ?? [],

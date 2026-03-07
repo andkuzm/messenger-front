@@ -8,7 +8,8 @@ export function useGetNotifications(chatId: number) {
             const res = await api.get(`/notification/${chatId}`);
             return res.data;
         },
-        staleTime: 1000 * 30,
+        staleTime: 1000 * 10,
+        refetchInterval: 1000 * 10,
         retry: 1,
     });
 }
